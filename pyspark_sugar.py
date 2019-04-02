@@ -66,7 +66,7 @@ def job_description_decor(description: str):
 
 
 @contextlib.contextmanager
-def job_group(group_id, description):
+def job_group(group_id, description=None):
     """Set current job group"""
     sc = pyspark.SparkContext.getOrCreate()  # type: pyspark.SparkContext
     sc.setJobGroup(str(group_id), description)
@@ -76,7 +76,7 @@ def job_group(group_id, description):
         sc.setJobGroup(None, None)
 
 
-def job_group_decor(group_id, description):
+def job_group_decor(group_id, description=None):
     """Set current job group for underlying function"""
 
     def decor(func):
@@ -100,11 +100,14 @@ def _action_wrapper(func):
         sc = pyspark.SparkContext.getOrCreate()  # type: pyspark.SparkContext
         f = inspect.getouterframes(inspect.currentframe())[1][0]
         prev_callsite_long = sc.getLocalProperty('callSite.long')
+        prev_callsite_short = sc.getLocalProperty('callSite.short')
         sc.setLocalProperty('callSite.long', _get_traceback(f))
+        sc.setLocalProperty('callSite.short', '%s at %s:%s' % (func.__name__, f.f_code.co_filename, f.f_lineno))
         try:
             return func(*args, **kwargs)
         finally:
             sc.setLocalProperty('callSite.long', prev_callsite_long)
+            sc.setLocalProperty('callSite.short', prev_callsite_short)
 
     return wrapper
 
