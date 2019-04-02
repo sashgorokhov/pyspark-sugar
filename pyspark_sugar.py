@@ -114,6 +114,7 @@ def _action_wrapper(func):
 
 @contextlib.contextmanager
 def patch_dataframe_actions():
+    """Patch almost-all dataframe and rdd actions that will set python stack trace into action job details"""
     with contextlib.ExitStack() as stack:
         for func in _DATAFRAME_ACTIONS:
             stack.enter_context(mock.patch.object(pyspark.sql.DataFrame, func.__name__, new=_action_wrapper(func)))
