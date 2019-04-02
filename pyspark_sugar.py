@@ -69,7 +69,7 @@ def job_description_decor(description: str):
 def job_group(group_id, description):
     """Set current job group"""
     sc = pyspark.SparkContext.getOrCreate()  # type: pyspark.SparkContext
-    sc.setJobGroup(str(group_id), str(description))
+    sc.setJobGroup(str(group_id), description)
     try:
         yield
     finally:
