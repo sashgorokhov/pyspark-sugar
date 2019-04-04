@@ -27,7 +27,7 @@ _RDD_ACTIONS = [
 
 
 @contextlib.contextmanager
-def job_description(description, parent=True):
+def job_description(description):
     """
     Set job description in spark ui.
 
@@ -37,18 +37,11 @@ def job_description(description, parent=True):
 
     sc = pyspark.SparkContext.getOrCreate()  # type: pyspark.SparkContext
 
-    prev_callsite_short = sc.getLocalProperty('callSite.short')
-
-    if parent and prev_callsite_short:
-        description = prev_callsite_short + ' -> ' + description
-
     sc.setJobDescription(description)
-    sc.setLocalProperty('callSite.short', description)
     try:
         yield
     finally:
         sc.setJobDescription(None)
-        sc.setLocalProperty('callSite.short', prev_callsite_short)
 
 
 def job_description_decor(description: str):
