@@ -9,7 +9,7 @@ setup(
     install_requires=['pyspark'],
     keywords=['pyspark'],
     name='pyspark_sugar',
-    version='0.3.1',
+    version='0.4',
     py_modules=['pyspark_sugar'],
     url='https://github.com/sashgorokhov/pyspark-sugar',
     license='MIT',
