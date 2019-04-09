@@ -138,6 +138,11 @@ class SCCallSiteSync:
             self._context._jsc.clearCallSite()
 
 
+@contextlib.contextmanager
+def SCCallSiteSyncDummy(*args, **kwargs):
+    yield
+
+
 def _action_wrapper(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -151,7 +156,7 @@ def _action_wrapper(func):
 @contextlib.contextmanager
 def patch_dataframe_actions():
     """Patch almost-all dataframe and rdd actions that will set python stack trace into action job details"""
-    with contextlib.ExitStack() as stack:
+    with contextlib.ExitStack() as stack, mock.patch('pyspark.sql.dataframe.SCCallSiteSync', new=SCCallSiteSyncDummy):
         for func in _DATAFRAME_ACTIONS:
             stack.enter_context(mock.patch.object(pyspark.sql.DataFrame, func.__name__, new=_action_wrapper(func)))
 
